@@ -1,9 +1,9 @@
 import { LightningElement, api, wire } from 'lwc';
 import { refreshApex } from '@salesforce/apex';
-import { reduceErrors } from 'c/ldsUtils';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getOpportunities from '@salesforce/apex/AccountOpportunitiesController.getOpportunities';
 
-COLUMNS = [
+const COLUMNS = [
     { label: 'Nom Opportunité', fieldName: 'Name', type: 'text' },
     { label: 'Montant', fieldName: 'Amount', type: 'currency' },
     { label: 'Date de Clôture', fieldName: 'CloseDate', type: 'date', typeAttributes: { day: 'numeric', month: 'short', year: 'numeric' } },
@@ -14,23 +14,42 @@ export default class AccountOpportunitiesViewer extends LightningElement {
     opportunities;
     errors;
     columns = COLUMNS;
+    wiredResult;
 
-    @wire(getOpportunities, { accountId: this.recordId })
-    wiredOpportunities({ data, error }) {
-        if (data) {
-            this.opportunities = data;
+    connectedCallback(event) {
+        console.log('ID ' + this.recordId)
+    }
+
+    @wire(getOpportunities, { accountId: '$recordId' })
+    wiredOpportunities(result) {
+        this.wiredResult = result;
+        if (result.data) {
+            this.opportunities = result.data;
             this.errors = undefined;
-            console.log("DATA" + data)
-            console.log("OPPORTUNITIES " + this.opportunities);
-        } else if (error) {
-            console.error('Erreur de récupération des opportunités:', error);
-            this.errors = reduceErrors(error);
+        } else if (result.error) {
+            this.errors = result.error;
             this.opportunities = undefined;
         }
     }
 
-    handleRafraichir() {
-        return refreshApex(this.wiredOpportunities);
+    handleRefresh() {
+        refreshApex(this.wiredResult)
+            .then(() => {
+                this.showToast('Succès', 'Les données ont été rafraîchies avec succès.', 'success');
+            })
+            .catch(error => {
+                this.showToast('Erreur', 'Échec lors du rafraîchissement des données.', 'error');
+                console.error('Erreur lors du rafraîchissement :', error);
+            });
+    }
+
+    showToast(title, message, style) {
+        const evt = new ShowToastEvent({
+            title,
+            message,
+            style
+        });
+        this.dispatchEvent(evt);
     }
 
 }
