@@ -11,15 +11,15 @@
                               class="slds-m-top_small">
             </lightning-button>
         </div>
-        <template if:true={cases}>
+        <template lwc:if={cases}>
             <lightning-datatable data={cases}
                                  columns={columns}
                                  key-field="Id"
                                  class="slds-m-top_medium">
             </lightning-datatable>
         </template>
-<template if:true={error}>
-            <p class="slds-p-around_medium slds-text-color_error">{error}</p>
+<template lwc:else>
+                    <p class="slds-p-around_medium slds-text-color_error">{error}</p>
         </template>
 </lightning-card>
 </template>
