@@ -31,6 +31,9 @@ export default class AccountOpportunitiesViewer extends LightningElement {
             this.opportunities = undefined;
         }
     }
+    get hasOpportunities() {
+        return (this.opportunities && this.opportunities.length > 0);
+    }
 
     handleRefresh() {
         refreshApex(this.wiredResult)
@@ -43,11 +46,11 @@ export default class AccountOpportunitiesViewer extends LightningElement {
             });
     }
 
-    showToast(title, message, style) {
+    showToast(title, message, variant) {
         const evt = new ShowToastEvent({
-            title,
-            message,
-            style
+            title: title,
+            message: message,
+            variant: variant
         });
         this.dispatchEvent(evt);
     }

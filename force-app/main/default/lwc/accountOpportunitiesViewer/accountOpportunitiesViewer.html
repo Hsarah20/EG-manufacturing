@@ -3,7 +3,7 @@
         <div class="slds-max-large-size_xx-large">
             <lightning-button class="slds-m-bottom_small" label="Rafraîchir" onclick={handleRefresh} variant="brand"></lightning-button>  
         </div>       
-        <template lwc:if={opportunities}>
+        <template lwc:if={hasOpportunities}>
             <lightning-datatable data={opportunities}
                                     columns={columns}
                                     key-field="Id"
